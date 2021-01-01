@@ -5,7 +5,7 @@
   when: mysql_root_password == '-----====>SetR00tPa$$wordH3r3!!!<====-----'
 
 - name: root password is present
-  mysql_user:
+  community.mysql.mysql_user:
     name: 'root'
     host_all: true
     password: '{{ mysql_root_password | mandatory }}'
@@ -17,20 +17,23 @@
     src: 'my.cnf.j2'
     dest: '{{ mysql_user_home }}/.my.cnf'
     mode: '0400'
+  register: root_my_cnf
   tags: my_cnf
 
 - name: test database is absent
-  mysql_db:
+  community.mysql.mysql_db:
     name: test
     state: absent
+    config_file: {{ root_my_cnf.dest }}
     login_unix_socket: "{{ login_unix_socket | default(omit) }}"
   when: mysql_remove_test_database
 
 - name: anonymous users are absent
-  mysql_user:
+  community.mysql.mysql_user:
     name: ''
     state: absent
     host_all: true
+    config_file: {{ root_my_cnf.dest }}
     login_unix_socket: "{{ login_unix_socket | default(omit) }}"
   when: mysql_remove_anonymous_users
 
@@ -39,4 +42,5 @@
     query:
       - DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1')
     login_unix_socket: "{{ login_unix_socket | default(omit) }}"
+    config_file: {{ root_my_cnf.dest }}
   when: mysql_remove_remote_root
