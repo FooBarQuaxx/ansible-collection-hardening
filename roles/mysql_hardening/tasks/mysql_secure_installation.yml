@@ -24,7 +24,7 @@
   community.mysql.mysql_db:
     name: test
     state: absent
-    config_file: {{ root_my_cnf.dest }}
+    config_file: "{{ root_my_cnf.dest }}"
     login_unix_socket: "{{ login_unix_socket | default(omit) }}"
   when: mysql_remove_test_database
 
@@ -33,7 +33,7 @@
     name: ''
     state: absent
     host_all: true
-    config_file: {{ root_my_cnf.dest }}
+    config_file: "{{ root_my_cnf.dest }}"
     login_unix_socket: "{{ login_unix_socket | default(omit) }}"
   when: mysql_remove_anonymous_users
 
@@ -47,7 +47,7 @@
                           '127.0.0.1',
                           '::1')
     login_unix_socket: "{{ login_unix_socket | default(omit) }}"
-    config_file: {{ root_my_cnf.dest }}
+    config_file: "{{ root_my_cnf.dest }}"
   when: mysql_remove_remote_root
 
 - name: get all users that have no authentication_string on MySQL version >= 5.7.6 or Mariadb version >= 10.4.0
